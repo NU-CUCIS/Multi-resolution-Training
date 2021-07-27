@@ -76,6 +76,29 @@ cd src/deepCam/run_scripts
 sbatch -N 64 run_training_cori.sh
 ```
 
+### Instructions to set up conda environment on Cori
+1. Set up a conda environment
+```
+module load python
+conda create -n mlperf_deepcam
+```
+2. Activate the environment.
+```
+source activate mlperf_deepcam
+```
+3. Load and configure the modules.
+```
+CPU (KNL): module load pytorch/1.7.1
+GPU:  module load cgpu pytorch/1.7.1-gpu
+```
+4. Install packages.
+```
+pip install --user h5py
+pip install --user wandb
+conda install basemap yt
+pip install git+https://github.com/ildoonet/pytorch-gradual-warmup-lr.git
+```
+
 ### Using Docker
 
 The implementation comes with a Dockerfile optimized for NVIDIA DGX-2 workstations but usable on 
