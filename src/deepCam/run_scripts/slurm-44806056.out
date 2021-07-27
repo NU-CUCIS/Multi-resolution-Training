@@ -1,0 +1,290 @@
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/global/u2/k/kwf5687/deepcam/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/lib/python3.8/site-packages/mpl_toolkits/basemap/__init__.py", line 157, in <module>
+    epsgf = open(os.path.join(pyproj_datadir,'epsg'))
+FileNotFoundError: [Errno 2] No such file or directory: '/global/homes/k/kwf5687/.conda/envs/mlperf_deepcam/share/basemap/epsg'
+srun: error: nid07071: task 21: Exited with exit code 1
+srun: launch/slurm: _step_signal: Terminating StepId=44806056.0
+srun: error: nid10228: task 30: Exited with exit code 1
+srun: error: nid10225: task 27: Exited with exit code 1
+srun: error: nid07852: task 25: Exited with exit code 1
+srun: error: nid07072: task 22: Exited with exit code 1
+srun: error: nid10229: task 31: Exited with exit code 1
+srun: error: nid10226: task 28: Exited with exit code 1
+srun: error: nid07851: task 24: Exited with exit code 1
+srun: error: nid06539: task 14: Exited with exit code 1
+srun: error: nid07850: task 23: Exited with exit code 1
+srun: error: nid07070: task 20: Exited with exit code 1
+srun: error: nid06275: task 10: Exited with exit code 1
+srun: error: nid06536: task 11: Exited with exit code 1
+srun: error: nid06553: task 15: Exited with exit code 1
+srun: error: nid06554: task 16: Exited with exit code 1
+srun: error: nid04634: task 1: Exited with exit code 1
+srun: error: nid06537: task 12: Exited with exit code 1
+srun: error: nid04633: task 0: Exited with exit code 1
+srun: error: nid06538: task 13: Exited with exit code 1
+srun: error: nid04734: task 6: Exited with exit code 1
+srun: error: nid07853: task 26: Exited with exit code 1
+srun: error: nid06555: task 17: Exited with exit code 1
+srun: error: nid06556: task 18: Exited with exit code 1
+srun: error: nid07069: task 19: Exited with exit code 1
+srun: error: nid06273: task 8: Exited with exit code 1
+srun: error: nid10227: task 29: Exited with exit code 1
+srun: error: nid06272: task 7: Exited with exit code 1
+srun: error: nid04636: task 3: Exited with exit code 1
+srun: error: nid04732: task 4: Exited with exit code 1
+srun: error: nid04635: task 2: Terminated
+srun: error: nid06274: task 9: Exited with exit code 1
+srun: error: nid04733: task 5: Terminated
+srun: Force Terminated StepId=44806056.0
