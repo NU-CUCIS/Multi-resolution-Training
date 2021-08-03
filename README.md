@@ -99,6 +99,29 @@ conda install basemap yt
 pip install git+https://github.com/ildoonet/pytorch-gradual-warmup-lr.git
 ```
 
+### Instructions to set up conda environment on Summit
+1. Set up a conda environment
+```
+module load open-ce/1.1.3-py37-0
+conda create --name mlperf_deepcam --clone open-ce-1.1.3-py37-0
+conda activate mlperf_deepcam
+```
+2. Activate the environment.
+```
+conda activate mlperf_deepcam
+```
+
+3. Install packages.
+```
+pip install --user wandb
+conda install basemap
+pip install git+https://github.com/ildoonet/pytorch-gradual-warmup-lr.git
+git clone https://github.com/mlperf/logging.git mlperf-logging
+pip install -e mlperf-logging
+```
+
+
+
 ### Using Docker
 
 The implementation comes with a Dockerfile optimized for NVIDIA DGX-2 workstations but usable on 
