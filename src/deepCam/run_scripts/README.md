@@ -1,3 +1,4 @@
+## Training on Cori
 ### Instructions to modify file run_training_cori.sh
 1. Edit the entries:
 ```
@@ -63,3 +64,48 @@ Traceback (most recent call last):
 UnboundLocalError: local variable 'viz' referenced before assignment
 ```
 Remove line 389 in file named `./src/deepCam/train_hdf5_ddp.py` when `training/validation_visualization_frequency` are set to 0 in file run_training_cori.sh.
+
+## Training on Summit
+### Fix error messages
+1. error message:
+```
+Traceback (most recent call last):
+  File "../train_hdf5_ddp.py", line 66, in <module>
+    from utils import visualizer as vizc
+  File "/autofs/nccs-svm1_home1/kwf5687/mlperf-deepcam/src/deepCam/utils/visualizer.py", line 38, in <module>
+    from mpl_toolkits.basemap import Basemap
+  File "/ccs/home/kwf5687/.conda/envs/mlperf_deepcam2/lib/python3.7/site-packages/mpl_toolkits/basemap/__init__.py", line 26, in <module>
+    from matplotlib.cbook import dedent
+ImportError: cannot import name 'dedent' from 'matplotlib.cbook' (/ccs/home/kwf5687/.conda/envs/mlperf_deepcam2/lib/python3.7/site-packages/matplotlib/cbook/__init__.py)
+```
+Replace the line import dedent in file named `/ccs/home/kwf5687/.conda/envs/mlperf_deepcam2/lib/python3.7/site-packages/mpl_toolkits/basemap/__init__.py` and `proj.py` with 
+```
+from inspect import cleandoc as dedent
+```
+
+2. error message:
+```
+CUDA Hook Library: Failed to find symbol mem_find_dreg_entries, ./a.out: undefined symbol: __PAMI_Invalidate_region
+```
+Can be fixed in 3 ways:
+```
+use jsrun -E LD_PRELOAD=/opt/ibm/spectrum_mpi/lib/pami_451/libpami.so ...
+use jsrun --smpiargs="off" ...
+use jsrun --smpiargs="-disable_gpu_hooks ...
+```
+
+3. Add extra wireup method in file named `comm.py`, function init():
+```
+elif method == "nccl":
+        world_size = int(os.environ['OMPI_COMM_WORLD_SIZE'])
+        world_rank = int(os.environ['OMPI_COMM_WORLD_RANK'])
+        local_rank = int(os.environ['OMPI_COMM_WORLD_LOCAL_RANK'])
+        import subprocess
+        get_master = "echo $(cat {} | sort | uniq | grep -v batch | grep -v login | head -1 )".format(os.environ['LSB_DJOB_HOSTFILE'])
+        os.environ['MASTER_ADDR'] = str(subprocess.check_output(get_master, shell=True))[2:-3]
+        os.environ['MASTER_PORT'] = "23456"
+        os.environ['WORLD_SIZE'] = os.environ['OMPI_COMM_WORLD_SIZE']
+        os.environ['RANK'] = os.environ['OMPI_COMM_WORLD_RANK']
+        dist.init_process_group(backend = "nccl", rank=world_rank, world_size=world_size)
+```
+
