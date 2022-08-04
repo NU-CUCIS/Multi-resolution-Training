@@ -26,8 +26,9 @@ import numpy as np
 import argparse as ap
 import datetime as dt
 import subprocess as sp
-import time
 
+import time
+from torchsummary import summary
 # logging
 # wandb
 have_wandb = False
@@ -52,8 +53,8 @@ from utils import utils
 from utils import losses
 from utils import parsing_helpers as ph
 from data import cam_hdf5_dataset as cam
+#from architecture import deeplab_xception_coarse
 from architecture import deeplab_xception
-from architecture import deeplab_xception_coarse
 #from architecture import deeplab_xception_cc
 #warmup scheduler
 have_warmup_scheduler = False
@@ -122,6 +123,7 @@ def main(pargs):
         torch.cuda.manual_seed(seed)
         #necessary for AMP to work
         torch.cuda.set_device(device)
+        #torch.cuda.set_device(local_rank)
     else:
         device = torch.device("cpu")
 
@@ -130,7 +132,6 @@ def main(pargs):
         
     #set up directories
     root_dir = os.path.join(pargs.data_dir_prefix)
-    root_c_dir = os.path.join(pargs.data_c_dir_prefix)
     output_dir = pargs.output_dir
     plot_dir = os.path.join(output_dir, "plots")
     if comm_rank == 0:
@@ -165,11 +166,9 @@ def main(pargs):
         
             #set general parameters
             config.root_dir = root_dir
-            config.root_c_dir = root_c_dir
             config.output_dir = pargs.output_dir
             config.max_epochs = pargs.max_epochs
             config.local_batch_size = pargs.local_batch_size
-            config.local_batch_size_c = pargs.local_batch_size_c
             config.num_workers = comm_size
             config.channels = pargs.channels
             config.optimizer = pargs.optimizer
@@ -181,6 +180,7 @@ def main(pargs):
             config.loss_weight_pow = pargs.loss_weight_pow
             config.lr_warmup_steps = pargs.lr_warmup_steps
             config.lr_warmup_factor = pargs.lr_warmup_factor
+            config.use_ddp = pargs.use_ddp
             
             # lr schedule if applicable
             if pargs.lr_schedule:
@@ -190,7 +190,6 @@ def main(pargs):
 
     # Logging hyperparameters
     logger.log_event(key = "global_batch_size", value = (pargs.local_batch_size * comm_size))
-    logger.log_event(key = "global_batch_size_c", value = (pargs.local_batch_size_c * comm_size))
     logger.log_event(key = "opt_name", value = pargs.optimizer)
     logger.log_event(key = "opt_base_learning_rate", value = pargs.start_lr * pargs.lr_warmup_factor)
     logger.log_event(key = "opt_learning_rate_warmup_steps", value = pargs.lr_warmup_steps)
@@ -204,10 +203,13 @@ def main(pargs):
                                           n_classes = n_output_channels, 
                                           os=16, pretrained=False, 
                                           rank = comm_rank)
-    net_c = deeplab_xception_coarse.DeepLabv3_plus(n_input = n_input_channels, 
-                                          n_classes = n_output_channels, 
-                                          os=16, pretrained=False, 
-                                          rank = comm_rank)
+    #print("PRINT NET:")
+    #print(net)
+    #print("PRINT NET SUMMARY:")
+    #summary(net, (16, 768, 1152))
+    
+    net.to(device)
+    #summary(net, (16, 384, 576))
 
     #select loss
     loss_pow = pargs.loss_weight_pow
@@ -217,51 +219,52 @@ def main(pargs):
     fpw_2 = 1.71641974795896018744
     criterion = losses.fp_loss
 
-    net_c.to(device)
-
-    #select optimizer_c
-    optimizer_c = None
-    if pargs.optimizer  == "Adam":
-        optimizer_c  = optim.Adam(net_c.parameters(), lr = pargs.start_lr, eps = pargs.adam_eps, weight_decay = pargs.weight_decay)
-    elif pargs.optimizer  == "AdamW":
-        optimizer_c  = optim.AdamW(net_c.parameters(), lr = pargs.start_lr, eps = pargs.adam_eps, weight_decay = pargs.weight_decay)
+    #select optimizer
+    optimizer = None
+    if pargs.optimizer == "Adam":
+        optimizer = optim.Adam(net.parameters(), lr = pargs.start_lr, eps = pargs.adam_eps, weight_decay = pargs.weight_decay)
+    elif pargs.optimizer == "AdamW":
+        optimizer = optim.AdamW(net.parameters(), lr = pargs.start_lr, eps = pargs.adam_eps, weight_decay = pargs.weight_decay)
     elif have_apex and (pargs.optimizer == "LAMB"):
-        optimizer_c  = aoptim.FusedLAMB(net_c.parameters(), lr = pargs.start_lr, eps = pargs.adam_eps, weight_decay = pargs.weight_decay)
+        optimizer = aoptim.FusedLAMB(net.parameters(), lr = pargs.start_lr, eps = pargs.adam_eps, weight_decay = pargs.weight_decay)
     else:
-        raise NotImplementedError("Error, optimizer_c  {} not supported".format(pargs.optimizer))
+        raise NotImplementedError("Error, optimizer {} not supported".format(pargs.optimizer))
 
     if have_apex:
-        net_c, optimizer_c = amp.initialize(net_c, optimizer_c, opt_level = pargs.amp_opt_level)
-
-    net_c = DDP(net_c)
+        print("have_apex")
+        #wrap model and opt into amp
+        net, optimizer = amp.initialize(net, optimizer, opt_level = pargs.amp_opt_level)
     
+    #make model distributed
+    if pargs.use_ddp == 1:
+        print("use DDP = 1")
+        net = DDP(net)
+    else:
+        print("use DDP = 0")
+
     #restart from checkpoint if desired
     #if (comm_rank == 0) and (pargs.checkpoint):
     #load it on all ranks for now
     if pargs.checkpoint:
         checkpoint = torch.load(pargs.checkpoint, map_location = device)
-        start_step_c = checkpoint['step']
-        start_epoch_c = checkpoint['epoch']
-        optimizer_c.load_state_dict(checkpoint['optimizer'])
-        net_c.load_state_dict(checkpoint['model'])
+        start_step = checkpoint['step']
+        start_epoch = checkpoint['epoch']
+        optimizer.load_state_dict(checkpoint['optimizer'])
+        net.load_state_dict(checkpoint['model'])
         if have_apex:
             amp.load_state_dict(checkpoint['amp'])
-        start_step = 0
-        start_epoch = 0
     else:
         start_step = 0
         start_epoch = 0
-        start_step_c = 0
-        start_epoch_c = 0
         
     #select scheduler
     if pargs.lr_schedule:
-        scheduler_after = ph.get_lr_schedule(pargs.start_lr, pargs.lr_schedule, optimizer_c, last_step = start_step)
+        scheduler_after = ph.get_lr_schedule(pargs.start_lr, pargs.lr_schedule, optimizer, last_step = start_step)
 
         # LR warmup
         if pargs.lr_warmup_steps > 0:
             if have_warmup_scheduler:
-                scheduler_c = GradualWarmupScheduler(optimizer_c, multiplier=pargs.lr_warmup_factor,
+                scheduler = GradualWarmupScheduler(optimizer, multiplier=pargs.lr_warmup_factor,
                                                    total_epoch=pargs.lr_warmup_steps,
                                                    after_scheduler=scheduler_after)
             # Throw an error if the package is not found
@@ -270,13 +273,11 @@ def main(pargs):
                                 'but warmup scheduler not found. Install it from '
                                 'https://github.com/ildoonet/pytorch-gradual-warmup-lr')
         else:
-            scheduler_c = scheduler_after
+            scheduler = scheduler_after
 
     #broadcast model and optimizer state
     steptens = torch.tensor(np.array([start_step, start_epoch]), requires_grad=False).to(device)
     dist.broadcast(steptens, src = 0)
-    steptens_c = torch.tensor(np.array([start_step_c, start_epoch_c]), requires_grad=False).to(device)
-    dist.broadcast(steptens_c, src = 0)
     
     ##broadcast model and optimizer state
     #hvd.broadcast_parameters(net.state_dict(), root_rank = 0)
@@ -285,8 +286,6 @@ def main(pargs):
     #unpack the bcasted tensor
     start_step = steptens.cpu().numpy()[0]
     start_epoch = steptens.cpu().numpy()[1]
-    start_step_c = steptens_c.cpu().numpy()[0]
-    start_epoch_c = steptens_c.cpu().numpy()[1]
 
     # Set up the data feeder
     # train
@@ -301,22 +300,8 @@ def main(pargs):
                                comm_rank = comm_rank)
     train_loader = DataLoader(train_set,
                               pargs.local_batch_size,
-                              num_workers = min([pargs.max_inter_threads, pargs.local_batch_size]),
-                              pin_memory = True,
-                              drop_last = True)
-
-    train_c_dir = os.path.join(root_c_dir, "train")
-    train_c_set = cam.CamDataset(train_c_dir, 
-                               statsfile = os.path.join(root_c_dir, 'stats.h5'),
-                               channels = pargs.channels,
-                               allow_uneven_distribution = False,
-                               shuffle = True, 
-                               preprocess = True,
-                               comm_size = comm_size,
-                               comm_rank = comm_rank)
-    train_c_loader = DataLoader(train_c_set,
-                              pargs.local_batch_size_c,
-                              num_workers = min([pargs.max_inter_threads, pargs.local_batch_size_c]),
+                              num_workers = 0,
+                              #num_workers = min([pargs.max_inter_threads, pargs.local_batch_size]),
                               pin_memory = True,
                               drop_last = True)
     
@@ -336,26 +321,9 @@ def main(pargs):
                                    num_workers = min([pargs.max_inter_threads, pargs.local_batch_size]),
                                    pin_memory = True,
                                    drop_last = True)
-    
-    validation_c_dir = os.path.join(root_c_dir, "validation")
-    validation_c_set = cam.CamDataset(validation_c_dir, 
-                               statsfile = os.path.join(root_c_dir, 'stats.h5'),
-                               channels = pargs.channels,
-                               allow_uneven_distribution = True,
-                               shuffle = (pargs.max_validation_steps is not None),
-                               preprocess = True,
-                               comm_size = comm_size,
-                               comm_rank = comm_rank)
-    # use batch size = 1 here to make sure that we do not drop a sample
-    validation_c_loader = DataLoader(validation_c_set,
-                                   1,
-                                   num_workers = min([pargs.max_inter_threads, pargs.local_batch_size_c]),
-                                   pin_memory = True,
-                                   drop_last = True)
 
     # log size of datasets
-    logger.log_event(key = "train_dense_samples", value = train_set.global_size)
-    logger.log_event(key = "train_coarse_samples", value = train_c_set.global_size)
+    logger.log_event(key = "train_samples", value = train_set.global_size)
     if pargs.max_validation_steps is not None:
         val_size = min([validation_set.global_size, pargs.max_validation_steps * pargs.local_batch_size * comm_size])
     else:
@@ -373,224 +341,7 @@ def main(pargs):
     # Train network
     if have_wandb and (comm_rank == 0):
         wandb.watch(net)
-
-    step = start_step_c
-    epoch = start_epoch_c
-    current_lr = pargs.start_lr if not pargs.lr_schedule else scheduler_c.get_last_lr()[0]
-    stop_training = False
-    net_c.train()
-
-    # start trining
-    logger.log_end(key = "init_stop", sync = True)
-    logger.log_start(key = "run_start", sync = True)
-    logger.log_event(key = "root_dir", value = root_c_dir)
-
-    # training loop
-    while True:
-
-        # start epoch
-        logger.log_start(key = "epoch_start", metadata = {'epoch_num': epoch+1, 'step_num': step}, sync=True)
-
-        # epoch loop
-        epoch_start_time = time.perf_counter()
-        for inputs, label, filename in train_c_loader:
-            
-            # send to device
-            inputs = inputs.to(device)
-            label = label.to(device)
-            
-            # forward pass
-            outputs = net_c.forward(inputs)
-            
-            # Compute loss and average across nodes
-            loss = criterion(outputs, label, weight=class_weights, fpw_1=fpw_1, fpw_2=fpw_2)
-            
-            # Backprop
-            optimizer_c.zero_grad()
-            if have_apex:
-                with amp.scale_loss(loss, optimizer_c) as scaled_loss:
-                    scaled_loss.backward()
-            else:
-                loss.backward()
-            optimizer_c.step()
-
-            # step counter
-            step += 1
-            
-            if pargs.lr_schedule:
-                current_lr = scheduler_c.get_last_lr()[0]
-                scheduler_c.step()
-            
-            #log if requested
-            if (step % int(pargs.logging_frequency * pargs.local_batch_size / pargs.local_batch_size_c) == 0):
-
-                # allreduce for loss
-                loss_avg = loss.detach()
-                dist.reduce(loss_avg, dst=0, op=dist.ReduceOp.SUM)
-                loss_avg_train = loss_avg.item() / float(comm_size)
-
-                # Compute score
-                predictions = torch.max(outputs, 1)[1]
-                iou = utils.compute_score(predictions, label, device_id=device, num_classes=3)
-                iou_avg = iou.detach()
-                dist.reduce(iou_avg, dst=0, op=dist.ReduceOp.SUM)
-                iou_avg_train = iou_avg.item() / float(comm_size)
-                
-                logger.log_event(key = "learning_rate", value = current_lr, metadata = {'epoch_num': epoch+1, 'step_num': step})
-                logger.log_event(key = "train_accuracy", value = iou_avg_train, metadata = {'epoch_num': epoch+1, 'step_num': step})
-                logger.log_event(key = "train_loss", value = loss_avg_train, metadata = {'epoch_num': epoch+1, 'step_num': step})
-                
-                if have_wandb and (comm_rank == 0):
-                    wandb.log({"train_loss": loss_avg.item() / float(comm_size)}, step = step)
-                    wandb.log({"train_accuracy": iou_avg.item() / float(comm_size)}, step = step)
-                    wandb.log({"learning_rate": current_lr}, step = step)
-
-            
-            # validation step if desired
-            if (step % int(pargs.validation_frequency * pargs.local_batch_size / pargs.local_batch_size_c) == 0):
-                
-                logger.log_start(key = "eval_start", metadata = {'epoch_num': epoch+1})
-
-                #eval
-                net_c.eval()
-                
-                count_sum_val = torch.Tensor([0.]).to(device)
-                loss_sum_val = torch.Tensor([0.]).to(device)
-                iou_sum_val = torch.Tensor([0.]).to(device)
-                
-                # disable gradients
-                with torch.no_grad():
-                
-                    # iterate over validation sample
-                    step_val = 0
-                    # only print once per eval at most
-                    visualized = False
-                    for inputs_val, label_val, filename_val in validation_c_loader:
-                        
-                        #send to device
-                        inputs_val = inputs_val.to(device)
-                        label_val = label_val.to(device)
-                        
-                        # forward pass
-                        outputs_val = net_c.forward(inputs_val)
-
-                        # Compute loss and average across nodes
-                        loss_val = criterion(outputs_val, label_val, weight=class_weights, fpw_1=fpw_1, fpw_2=fpw_2)
-                        loss_sum_val += loss_val
-                        
-                        #increase counter
-                        count_sum_val += 1.
-                        
-                        # Compute score
-                        predictions_val = torch.max(outputs_val, 1)[1]
-                        iou_val = utils.compute_score(predictions_val, label_val, device_id=device, num_classes=3)
-                        iou_sum_val += iou_val
-
-                        #increase eval step counter
-                        step_val += 1
-                        
-                        if (pargs.max_validation_steps is not None) and step_val > pargs.max_validation_steps:
-                            break
-                        
-                # average the validation loss
-                dist.all_reduce(count_sum_val, op=dist.ReduceOp.SUM)
-                dist.all_reduce(loss_sum_val, op=dist.ReduceOp.SUM)
-                dist.all_reduce(iou_sum_val, op=dist.ReduceOp.SUM)
-                loss_avg_val = loss_sum_val.item() / count_sum_val.item()
-                iou_avg_val = iou_sum_val.item() / count_sum_val.item()
-                
-                # print results
-                logger.log_event(key = "eval_accuracy", value = iou_avg_val, metadata = {'epoch_num': epoch+1, 'step_num': step})
-                logger.log_event(key = "eval_loss", value = loss_avg_val, metadata = {'epoch_num': epoch+1, 'step_num': step})
-
-                # log in wandb
-                if have_wandb and (comm_rank == 0):
-                    wandb.log({"eval_loss": loss_avg_val}, step=step)
-                    wandb.log({"eval_accuracy": iou_avg_val}, step=step)
-
-                if (iou_avg_val >= pargs.target_iou):
-                    logger.log_event(key = "target_accuracy_reached", value = pargs.target_iou, metadata = {'epoch_num': epoch+1, 'step_num': step})
-                    stop_training = True
-
-                # set to train
-                net_c.train()
-
-                logger.log_end(key = "eval_stop", metadata = {'epoch_num': epoch+1})
-            
-            #save model if desired
-            if (pargs.save_frequency > 0) and (step % pargs.save_frequency == 0):
-                logger.log_start(key = "save_start", metadata = {'epoch_num': epoch+1, 'step_num': step}, sync = True)
-                if comm_rank == 0:
-                    checkpoint = {
-                        'step': step,
-                        'epoch': epoch,
-                        'model': net_c.state_dict(),
-                        'optimizer': optimizer_c.state_dict()
-		    }
-                    if have_apex:
-                        checkpoint['amp'] = amp.state_dict()
-                    torch.save(checkpoint, os.path.join(output_dir, pargs.model_prefix + "_step_" + str(step) + ".cpt") )
-                logger.log_end(key = "save_stop", metadata = {'epoch_num': epoch+1, 'step_num': step}, sync = True)
-
-            # Stop training?
-            if stop_training:
-                break
-        epoch_timing = time.perf_counter() - epoch_start_time
-        epoch_timing = torch.tensor(epoch_timing).to(device)
-        dist.reduce(epoch_timing, dst=0, op=dist.ReduceOp.MAX)
-        epoch_max_timing = epoch_timing.item()
-
-        # log the epoch
-        logger.log_event(key = "epoch_time", value = epoch_max_timing, metadata = {'epoch_num': epoch+1, 'step_num': step})
-        logger.log_end(key = "epoch_stop", metadata = {'epoch_num': epoch+1, 'step_num': step}, sync = True)
-        epoch += 1
-        
-        # are we done?
-        if epoch >= 7 or stop_training:
-            break
-
-    net_c = net_c.cpu()
-    net_c_weights = net_c.state_dict()
-
-    net.to(device)
-
-    #select optimizer
-    optimizer = None
-    if pargs.optimizer == "Adam":
-        optimizer = optim.Adam(net.parameters(), lr = pargs.start_lr, eps = pargs.adam_eps, weight_decay = pargs.weight_decay)
-    elif pargs.optimizer == "AdamW":
-        optimizer = optim.AdamW(net.parameters(), lr = pargs.start_lr, eps = pargs.adam_eps, weight_decay = pargs.weight_decay)
-    elif have_apex and (pargs.optimizer == "LAMB"):
-        optimizer = aoptim.FusedLAMB(net.parameters(), lr = pargs.start_lr, eps = pargs.adam_eps, weight_decay = pargs.weight_decay)
-    else:
-        raise NotImplementedError("Error, optimizer {} not supported".format(pargs.optimizer))
-
-    if have_apex:
-        #wrap model and opt into amp
-        net, optimizer = amp.initialize(net, optimizer, opt_level = pargs.amp_opt_level)
     
-    #select scheduler
-    if pargs.lr_schedule:
-        scheduler_after = ph.get_lr_schedule(pargs.start_lr, pargs.lr_schedule, optimizer, last_step = start_step)
-
-        # LR warmup
-        if pargs.lr_warmup_steps > 0:
-            if have_warmup_scheduler:
-                scheduler = GradualWarmupScheduler(optimizer, multiplier=pargs.lr_warmup_factor,
-                                                   total_epoch=pargs.lr_warmup_steps,
-                                                   after_scheduler=scheduler_after)
-            # Throw an error if the package is not found
-            else:
-                raise Exception(f'Requested {pargs.lr_warmup_steps} LR warmup steps '
-                                'but warmup scheduler not found. Install it from '
-                                'https://github.com/ildoonet/pytorch-gradual-warmup-lr')
-        else:
-            scheduler = scheduler_after
-
-    #make model distributed
-    net = DDP(net)
-    net.load_state_dict(net_c_weights)
-
     step = start_step
     epoch = start_epoch
     current_lr = pargs.start_lr if not pargs.lr_schedule else scheduler.get_last_lr()[0]
@@ -600,25 +351,30 @@ def main(pargs):
     # start trining
     logger.log_end(key = "init_stop", sync = True)
     logger.log_start(key = "run_start", sync = True)
-    logger.log_event(key = "root_dir", value = root_dir)
 
-    # training loop
+    # training lo
     while True:
 
         # start epoch
         logger.log_start(key = "epoch_start", metadata = {'epoch_num': epoch+1, 'step_num': step}, sync=True)
 
-        epoch_start_time = time.perf_counter()
+        train_timing = 0.0
+        eval_timing = 0.0
+        epoch_timing = 0.0
+        log_timing = 0.0
         # epoch loop
+        epoch_start_time = time.perf_counter()
         for inputs, label, filename in train_loader:
-            
+
+            start_time = time.perf_counter()            
             # send to device
             inputs = inputs.to(device)
             label = label.to(device)
             
             # forward pass
             outputs = net.forward(inputs)
-            
+            #print("Print net :")
+            #print(net)            
             # Compute loss and average across nodes
             loss = criterion(outputs, label, weight=class_weights, fpw_1=fpw_1, fpw_2=fpw_2)
             
@@ -631,6 +387,7 @@ def main(pargs):
                 loss.backward()
             optimizer.step()
 
+            train_timing += time.perf_counter() - start_time
             # step counter
             step += 1
             
@@ -655,14 +412,14 @@ def main(pargs):
                     outputfile = os.path.join(plot_dir, outputfile)
                 
                     # plot
-                    #viz.plot(filename[sample_idx], outputfile, plot_input, plot_prediction, plot_label)
+                    viz.plot(filename[sample_idx], outputfile, plot_input, plot_prediction, plot_label)
                 
                     #log if requested
                     if have_wandb:
                         img = Image.open(outputfile)
                         wandb.log({"train_examples": [wandb.Image(img, caption="Prediction vs. Ground Truth")]}, step = step)
             
-            
+            log_start_time = time.perf_counter()            
             #log if requested
             if (step % pargs.logging_frequency == 0):
 
@@ -686,19 +443,21 @@ def main(pargs):
                     wandb.log({"train_loss": loss_avg.item() / float(comm_size)}, step = step)
                     wandb.log({"train_accuracy": iou_avg.item() / float(comm_size)}, step = step)
                     wandb.log({"learning_rate": current_lr}, step = step)
-
+            log_timing += time.perf_counter() - log_start_time
             
             # validation step if desired
             if (step % pargs.validation_frequency == 0):
                 
                 logger.log_start(key = "eval_start", metadata = {'epoch_num': epoch+1})
-
+                start_eval_time = time.perf_counter()
                 #eval
                 net.eval()
                 
                 count_sum_val = torch.Tensor([0.]).to(device)
                 loss_sum_val = torch.Tensor([0.]).to(device)
                 iou_sum_val = torch.Tensor([0.]).to(device)
+                #loss_sum_val = torch.Tensor([0.])
+                #iou_sum_val = torch.Tensor([0.])
                 
                 # disable gradients
                 with torch.no_grad():
@@ -762,7 +521,9 @@ def main(pargs):
                 dist.all_reduce(iou_sum_val, op=dist.ReduceOp.SUM)
                 loss_avg_val = loss_sum_val.item() / count_sum_val.item()
                 iou_avg_val = iou_sum_val.item() / count_sum_val.item()
-                
+                del loss_sum_val
+                del iou_sum_val
+                eval_timing += time.perf_counter() - start_eval_time
                 # print results
                 logger.log_event(key = "eval_accuracy", value = iou_avg_val, metadata = {'epoch_num': epoch+1, 'step_num': step})
                 logger.log_event(key = "eval_loss", value = loss_avg_val, metadata = {'epoch_num': epoch+1, 'step_num': step})
@@ -799,20 +560,47 @@ def main(pargs):
             # Stop training?
             if stop_training:
                 break
+        
         epoch_timing = time.perf_counter() - epoch_start_time
-        epoch_timing = torch.tensor(epoch_timing).to(device)
-        dist.reduce(epoch_timing, dst=0, op=dist.ReduceOp.MAX)
-        epoch_max_timing = epoch_timing.item()
+        read_time = 0.0
+        
+        read_time = train_set.inq_read_time()
+        read_time = torch.tensor(read_time).to(device)
+        dist.reduce(read_time, dst=0, op=dist.ReduceOp.MAX)
+        read_max_time = read_time.item()
 
+        logger.log_event(key = "read_time_per_epoch", value = read_max_time, metadata = {'epoch_num': epoch+1, 'step_num': step})
+
+        train_timing = torch.tensor(train_timing).to(device)
+        epoch_timing = torch.tensor(epoch_timing).to(device)
+        log_timing = torch.tensor(log_timing).to(device)
+        dist.reduce(train_timing, dst=0, op=dist.ReduceOp.MAX)
+        dist.reduce(epoch_timing, dst=0, op=dist.ReduceOp.MAX)
+        dist.reduce(log_timing, dst=0, op=dist.ReduceOp.MAX)
+        train_timing_max = train_timing.item()
+        epoch_timing_max = epoch_timing.item()
+        log_timing_max = log_timing.item()
+
+        logger.log_event(key = "train_time", value = train_timing_max, metadata = {'epoch_num': epoch+1, 'step_num': step})
+        logger.log_event(key = "epoch_time", value = epoch_timing_max, metadata = {'epoch_num': epoch+1, 'step_num': step})
+        logger.log_event(key = "log_time", value = log_timing_max, metadata = {'epoch_num': epoch+1, 'step_num': step})
+
+        #print("Epoch " + str(epoch+1) + " eval time: " + str(eval_timing))
+        #print("Epoch " + str(epoch+1) + " train time: " + str(train_timing))             
+        #print("Epoch " + str(epoch+1) + " total epoch time: " + str(epoch_timing))
+        #print("Epoch " + str(epoch+1) + " log time: " + str(log_timing))
         # log the epoch
-        logger.log_event(key = "epoch_time", value = epoch_max_timing, metadata = {'epoch_num': epoch+1, 'step_num': step})
         logger.log_end(key = "epoch_stop", metadata = {'epoch_num': epoch+1, 'step_num': step}, sync = True)
+        
+        train_set.initialize_read_time()
+        #print("Rank " + str(comm_rank) + " Epoch " + str(epoch) +"cuda memory_stats :")
+        #print(torch.cuda.memory_stats())
         epoch += 1
         
         # are we done?
         if epoch >= pargs.max_epochs or stop_training:
             break
-    
+
     # run done
     logger.log_end(key = "run_stop", sync = True, metadata = {'status' : 'success'})
 
@@ -836,7 +624,6 @@ if __name__ == "__main__":
     AP.add_argument("--training_visualization_frequency", type=int, default = 50, help="Frequency with which a random sample is visualized during training")
     AP.add_argument("--validation_visualization_frequency", type=int, default = 50, help="Frequency with which a random sample is visualized during validation")
     AP.add_argument("--local_batch_size", type=int, default=1, help="Number of samples per local minibatch")
-    AP.add_argument("--local_batch_size_c", type=int, default=1, help="Number of samples per local minibatch")
     AP.add_argument("--channels", type=int, nargs='+', default=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], help="Channels used in input")
     AP.add_argument("--optimizer", type=str, default="Adam", choices=["Adam", "AdamW", "LAMB"], help="Optimizer to use (LAMB requires APEX support).")
     AP.add_argument("--start_lr", type=float, default=1e-3, help="Start LR")
@@ -846,12 +633,12 @@ if __name__ == "__main__":
     AP.add_argument("--lr_warmup_steps", type=int, default=0, help="Number of steps for linear LR warmup")
     AP.add_argument("--lr_warmup_factor", type=float, default=1., help="Multiplier for linear LR warmup")
     AP.add_argument("--lr_schedule", action=StoreDictKeyPair)
-    AP.add_argument("--target_iou", type=float, default=0.82, help="Target IoU score.")
+    AP.add_argument("--target_iou", type=float, default=1.00, help="Target IoU score.")
     AP.add_argument("--model_prefix", type=str, default="model", help="Prefix for the stored model")
     AP.add_argument("--amp_opt_level", type=str, default="O0", help="AMP optimization level")
     AP.add_argument("--enable_wandb", action='store_true')
     AP.add_argument("--resume_logging", action='store_true')
-    AP.add_argument("--data_c_dir_prefix", type=str, default='/', help="prefix to data_c dir")
+    AP.add_argument("--use_ddp", type=int, default=1)
     pargs = AP.parse_args()
     
     #run the stuff
