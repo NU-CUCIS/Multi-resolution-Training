@@ -24,6 +24,7 @@ import os
 import h5py as h5
 import numpy as np
 import math
+import time
 from time import sleep
 
 import torch
@@ -78,7 +79,7 @@ class CamDataset(Dataset):
         self.comm_size = comm_size
         self.comm_rank = comm_rank
         self.allow_uneven_distribution = allow_uneven_distribution
-        
+        self.read_time = 0.0
         #split list of files
         self.rng = np.random.RandomState(seed)
         
@@ -118,14 +119,23 @@ class CamDataset(Dataset):
         filename = os.path.join(self.source, self.files[idx])
 
         #load data and project
+        #print("Rank " + str(self.comm_rank) + " open " + filename)
+        start_time = time.time()
         with h5.File(filename, "r") as f:
             data = f["climate/data"][..., self.channels]
             label = f["climate/labels_0"][...]
-        
+        #print("opened" + filename)
         #transpose to NCHW
+        self.read_time += time.time() - start_time
         data = np.transpose(data, (2,0,1))
         
         #preprocess
         data = self.data_scale * (data - self.data_shift)
         
         return data, label, filename
+
+    def inq_read_time(self):
+        return self.read_time
+
+    def initialize_read_time(self):
+        self.read_time = 0.0
