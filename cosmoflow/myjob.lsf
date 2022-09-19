@@ -1,0 +1,19 @@
+#!/bin/bash
+#BSUB -P AST153
+#BSUB -W 00:40
+#BSUB -nnodes 6
+#BSUB -J lk
+#BSUB -o lk.%J
+#BSUB -e lk.%J
+
+#export OMP_NUM_THREADS=32
+jsrun -n32 -a1 -c4 -g1 python3 main.py --epochs=100 \
+                                       --batch_size=8 \
+                                       --overlap=0 \
+                                       --checkpoint=1 \
+                                       --file_shuffle=1 \
+                                       --buffer_size=128 \
+                                       --record_acc=0 \
+                                       --config="test_summit.yaml" \
+                                       --evaluate=1 \
+                                       --async_io=0
