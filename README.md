@@ -1,9 +1,19 @@
 # Using Multi-Resolution Data to Accelerate Training for DeepCAM
-This repository contains an improvement of [DeepCAM](https://github.com/azrael417/mlperf-deepcam) by adding the support of utlizing multi-resolution data.
+This repository contains an improvement of [DeepCAM](https://github.com/azrael417/mlperf-deepcam) and [CosmoFlow](https://arxiv.org/abs/1808.04728) by adding the support of utlizing multi-resolution data.
+
 DeepCAM is a parallel deep learning climate segmentation benchmark. The source codes of DeepCAM are available on both [github](	
 https://github.com/azrael417/mlperf-deepcam) and [MLPerf](https://mlcommons.org/en/training-hpc-10/).
 The [training data files](https://app.globus.org/file-manager?origin_id=0b226e2c-4de0-11ea-971a-021304b0cca7&origin_path=%2F) are available at GLOBUS.
 
+CosmoFlow is a parallel deep learning application developed for studying
+data generated from cosmological N-body dark matter simulations.
+The source codes of CosmoFlow are available on both
+[github](https://github.com/NERSC/CosmoFlow)
+and [MLPerf](https://mlcommons.org/en/training-hpc-10/).
+Programs in this repo update the CosmoFlow source codes by incorporating
+the [LBANN model](https://www.osti.gov/servlets/purl/1548314)
+and parallelizing it using [Horovod](https://github.com/horovod/horovod#citation).
+The [training data files](https://portal.nersc.gov/project/m3363/) are available at NERSC.
 
 ## Publication
 * Kewei Wang, Sunwoo Lee, Jan Balewski, Alex Sim, Peter Nugent, Ankit Agrawal, Alok Choudhary, Kesheng Wu, and Wei-keng Liao. Using Multi-Resolution Data to Accelerate Neural Network Training in Scientific Applications. In the 22nd IEEE/ACM International Symposium on Cluster, Cloud and Internet Computing (CCGrid), May 2022.
