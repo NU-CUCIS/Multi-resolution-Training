@@ -1,4 +1,4 @@
-# Using Multi-Resolution Data to Accelerate Training for DeepCAM
+# Using Multi-Resolution Data to Accelerate Training for CosmoFlow and DeepCAM
 This repository contains an improvement of [DeepCAM](https://github.com/azrael417/mlperf-deepcam) and [CosmoFlow](https://arxiv.org/abs/1808.04728) by adding the support of utlizing multi-resolution data.
 
 DeepCAM is a parallel deep learning climate segmentation benchmark. The source codes of DeepCAM are available on both [github](	
