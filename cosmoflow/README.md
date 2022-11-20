@@ -1,6 +1,16 @@
 
 ## CosmoFlow Run Instructions
-### Instructions to run on Cori
+CosmoFlow is a parallel deep learning application developed for studying
+data generated from cosmological N-body dark matter simulations.
+The source codes of CosmoFlow are available on both
+[github](https://github.com/NERSC/CosmoFlow)
+and [MLPerf](https://mlcommons.org/en/training-hpc-10/).
+Programs in this repo update the CosmoFlow source codes by incorporating
+the [LBANN model](https://www.osti.gov/servlets/purl/1548314)
+and parallelizing it using [Horovod](https://github.com/horovod/horovod#citation).
+The [training data files](https://portal.nersc.gov/project/m3363/) are available at NERSC.
+
+### Instructions to run on [Cori](https://docs.nersc.gov/systems/cori/)
 1. Load and configure the modules.
 ```
 CPU (KNL): module load tensorflow/intel-2.4.1
@@ -27,7 +37,7 @@ GPU:  module load cgpu tensorflow/gpu-2.2.0-py37
 sbatch sbatch.sh
 ```
 
-### Instructions to run on Summit
+### Instructions to run on [Summit](https://www.olcf.ornl.gov/summit/)
 1. Load the modules.
 ```
 module load open-ce/1.4.0
