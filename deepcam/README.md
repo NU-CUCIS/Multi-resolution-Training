@@ -1,4 +1,7 @@
 ## DeepCAM Run Instructions
+DeepCAM is a parallel deep learning climate segmentation benchmark. The source codes of DeepCAM are available on both [github](	
+https://github.com/azrael417/mlperf-deepcam) and [MLPerf](https://mlcommons.org/en/training-hpc-10/).
+The [training data files](https://app.globus.org/file-manager?origin_id=0b226e2c-4de0-11ea-971a-021304b0cca7&origin_path=%2F) are available at GLOBUS.
 
 Submission scripts are in `deepcam/src/deepCam/run_scripts`.
 ### Before you run
@@ -17,7 +20,7 @@ Create a file named `.wandbirc` containing the user login and the API key as fol
 
 Place this file in a directory accessible by the workers.
 
-### Instructions to run on Cori
+### Instructions to run on [Cori](https://docs.nersc.gov/systems/cori/)
 1. Set up a conda environment
 ```
 module load python
@@ -61,7 +64,7 @@ cd src/deepCam/run_scripts
 sbatch cori-gpu64.sh
 ```
 
-### Instructions to run on Summit
+### Instructions to run on [Summit](https://www.olcf.ornl.gov/summit/)
 1. Set up a conda environment
 ```
 module load open-ce/1.1.3-py37-0
